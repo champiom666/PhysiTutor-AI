@@ -233,12 +233,26 @@ class LLMService:
             import json
             try:
                 result = json.loads(text)
+                
+                # Robustness check: Ensure required fields are present and are strings
+                # Some models might return nested objects for 'standard_solution'
+                for field in ["evaluation", "standard_solution"]:
+                    val = result.get(field)
+                    if val is None:
+                        result[field] = ""
+                    elif not isinstance(val, str):
+                        # Convert nested structures to formatted string if necessary
+                        if isinstance(val, (dict, list)):
+                            result[field] = json.dumps(val, indent=2, ensure_ascii=False)
+                        else:
+                            result[field] = str(val)
+                
                 return result
             except json.JSONDecodeError:
                 # Fallback if json parsing fails
                 return {
                     "evaluation": text,
-                    "standard_solution": "（解析生成格式异常，请参考评价内容）"
+                    "standard_solution": "（解析生成格式异常，请查看上方点评）"
                 }
                 
         except Exception as e:

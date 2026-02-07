@@ -372,3 +372,4 @@ class DialogueManager:
 
 # Global dialogue manager instance
 dialogue_manager = DialogueManager()
+# Reload data
