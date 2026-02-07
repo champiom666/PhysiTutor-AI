@@ -1,0 +1,18 @@
+# PhysiTutor-AI MVP Dependencies
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Gemini API
+google-generativeai==0.3.2
+
+# Data Validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Utilities
+httpx==0.26.0
