@@ -1,6 +1,6 @@
 venv312
 .env
-data
+data\logs
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

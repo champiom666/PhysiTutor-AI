@@ -1,0 +1,113 @@
+{
+    "id": "pressure_cylinder_complex_01",
+    "topic": "液体压强 + 固体压强 + 浮沉状态",
+    "difficulty": "中考压轴",
+    "image": "/static/images/question_01.png",
+    "question_context": {
+        "description": "如图所示，两个完全相同的底面积为 1×10⁻² m² 的轻质薄壁圆柱形容器 A、B 放在水平桌面上。容器足够高。有两个完全相同的圆柱体甲、乙，圆柱体的底面积是容器底面积的一半。A 中盛有质量为 5 kg 的水，B 中放置圆柱体乙。",
+        "ask": [
+            "① 水对容器 A 底部的压强 p₀",
+            "② 容器 A 中水的深度 h",
+            "③ 通过两种不同方法增加水或放入圆柱体后，判断压强变化情况，并求圆柱体质量 m"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "concept_judgement",
+            "prompt": "在第①问中，容器 A 底部所受的压强主要由什么决定？",
+            "options": [
+                "A. 水的质量",
+                "B. 水的深度",
+                "C. 容器底面积",
+                "D. 水的体积"
+            ],
+            "correct": "B",
+            "feedback": {
+                "correct": "很好，你抓住了关键：液体对底部的压强只与液体密度、深度和重力加速度有关。",
+                "incorrect": "这是一个常见误区。液体压强并不直接由质量或体积决定，建议回忆液体压强公式中出现的量。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "direction_judgement",
+            "prompt": "既然压强由水的深度决定，那么下一步你认为应该先求什么？",
+            "options": [
+                "A. 水的体积",
+                "B. 水的密度",
+                "C. 水的深度",
+                "D. 容器对桌面的压力"
+            ],
+            "correct": "C",
+            "feedback": {
+                "correct": "判断正确。这道题的突破口在于先求出水的深度。",
+                "incorrect": "方向有点偏。当前目标是底部压强，而压强和水深直接相关。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "model_judgement",
+            "prompt": "要由水的质量求水的深度，需要用到哪种关系模型？",
+            "options": [
+                "A. 压强公式",
+                "B. 密度定义式",
+                "C. 浮力公式",
+                "D. 功的公式"
+            ],
+            "correct": "B",
+            "feedback": {
+                "correct": "对，通过质量、密度和体积的关系可以间接求出水深。",
+                "incorrect": "这一步不是直接算压强，而是先建立水深与已知量的关系。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "comparison_judgement",
+            "prompt": "在方法 a 和方法 b 中，哪一种一定会改变水对容器底部的压强？",
+            "options": [
+                "A. 只放入圆柱体",
+                "B. 只加水",
+                "C. 两种都会",
+                "D. 两种都不会"
+            ],
+            "correct": "B",
+            "feedback": {
+                "correct": "很好，加水一定会改变水的深度，从而改变底部压强。",
+                "incorrect": "可以从'水深是否改变'这个角度重新思考。"
+            }
+        },
+        {
+            "step_id": 5,
+            "type": "state_judgement",
+            "prompt": "根据表格中压强变化数据判断，圆柱体在水中更可能处于哪种状态？",
+            "options": [
+                "A. 漂浮",
+                "B. 悬浮",
+                "C. 沉底但未浸没",
+                "D. 完全浸没并接触底部"
+            ],
+            "correct": "B",
+            "feedback": {
+                "correct": "判断非常关键。只有悬浮状态，才可能使压强变化呈现这种对应关系。",
+                "incorrect": "可以结合'是否对容器底部产生额外压力'来重新判断。"
+            }
+        },
+        {
+            "step_id": 6,
+            "type": "reverse_reasoning",
+            "prompt": "既然圆柱体处于悬浮状态，那么它的重力与什么力大小相等？",
+            "options": [
+                "A. 支持力",
+                "B. 压力",
+                "C. 浮力",
+                "D. 摩擦力"
+            ],
+            "correct": "C",
+            "feedback": {
+                "correct": "很好，这一步为计算圆柱体质量奠定了物理关系。",
+                "incorrect": "悬浮状态下物体不接触底部，可以思考它受到了哪种向上的力。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}
