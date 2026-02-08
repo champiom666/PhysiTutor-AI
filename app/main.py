@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from app.routes import session_router, dialogue_router
 from app.services.logger import dialogue_logger
@@ -52,6 +52,24 @@ if static_dir.exists():
 # Register routers
 app.include_router(session_router)
 app.include_router(dialogue_router)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """避免浏览器请求 /favicon.ico 时返回 404。"""
+    favicon_path = PROJECT_ROOT / "static" / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(favicon_path, media_type="image/x-icon")
+    return Response(status_code=204)
+
+
+@app.get("/robots.txt", include_in_schema=False)
+async def robots():
+    """避免爬虫/浏览器请求 /robots.txt 时返回 404。"""
+    robots_path = PROJECT_ROOT / "static" / "robots.txt"
+    if robots_path.exists():
+        return FileResponse(robots_path, media_type="text/plain")
+    return Response(status_code=204)
 
 
 @app.get("/")

@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     
     # Gemini API
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-3-flash-preview"
     
     # Application
     app_env: str = os.getenv("APP_ENV", "development")

@@ -53,8 +53,11 @@ copy .env.example .env
 ### 3. 启动服务
 
 ```bash
-# 开发模式启动
+# 开发模式启动（仅本机可访问）
 uvicorn app.main:app --reload --port 8000
+
+# 允许外网/公网 IP 访问（部署到服务器时用）
+uvicorn app.main:app --reload --port 8000 --host 0.0.0.0
 ```
 
 ### 4. 访问 API 文档

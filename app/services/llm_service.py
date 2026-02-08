@@ -1,33 +1,60 @@
 """
 PhysiTutor-AI Gemini API Service
-Simple wrapper for Gemini API calls.
+调用方式与 scripts/test_gemini.py 一致：REST API（requests），超时 120s。
 """
-import google.generativeai as genai
+import json
+import requests
+from requests.adapters import HTTPAdapter
 from typing import Optional, List, Dict
+from urllib3.util.retry import Retry
 
 from config.settings import settings, get_system_prompt
 
+# 与 test_gemini.py 一致的超时时间
+GEMINI_TIMEOUT = 120
+
+
+def _call_gemini_rest(api_key: str, model: str, prompt: str, timeout: int = GEMINI_TIMEOUT) -> str:
+    """
+    与 scripts/test_gemini.py 同方式：REST API 调用 Gemini generateContent。
+    """
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    headers = {"Content-Type": "application/json", "X-goog-api-key": api_key}
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+
+    session = requests.Session()
+    retry = Retry(
+        total=2,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["POST"],
+    )
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+
+    resp = session.post(url, headers=headers, json=payload, timeout=timeout)
+    resp.raise_for_status()
+    result = resp.json()
+    return result["candidates"][0]["content"]["parts"][0]["text"].strip()
+
 
 class LLMService:
-    """Service for interacting with Gemini API."""
-    
+    """Service for interacting with Gemini API (REST, same as test_gemini.py)."""
+
     def __init__(self):
-        """Initialize the Gemini client."""
+        """Initialize with API key and model name from settings."""
         self.api_key = settings.gemini_api_key
         self.model_name = settings.gemini_model
         self.system_prompt = get_system_prompt()
-        
-        # Configure the API
-        if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel(self.model_name)
-        else:
-            self.model = None
-    
+        self.timeout = GEMINI_TIMEOUT
+
     def is_configured(self) -> bool:
         """Check if the API is properly configured."""
-        return self.model is not None and bool(self.api_key)
-    
+        return bool(self.api_key and self.api_key.strip())
+
+    def _generate_content(self, prompt: str) -> str:
+        """Single REST call to Gemini generateContent, timeout=120s."""
+        return _call_gemini_rest(self.api_key, self.model_name, prompt, timeout=self.timeout)
+
     def generate_feedback(
         self,
         step_prompt: str,
@@ -38,38 +65,19 @@ class LLMService:
     ) -> str:
         """
         Generate enhanced AI feedback for a student's choice.
-        
-        This can be used to provide more personalized feedback beyond
-        the pre-defined feedback in the question data.
-        
-        Args:
-            step_prompt: The current step's prompt
-            student_choice: The choice the student made
-            is_correct: Whether the choice was correct
-            base_feedback: The pre-defined feedback from question data
-            context: Optional additional context
-            
-        Returns:
-            Enhanced feedback string
         """
         if not self.is_configured():
-            # Return base feedback if API not configured
             return base_feedback
-        
-        # For MVP, we primarily use pre-defined feedback
-        # AI is used for edge cases or when more guidance is needed
+
         try:
             prompt = self._build_feedback_prompt(
                 step_prompt, student_choice, is_correct, base_feedback, context
             )
-            
-            response = self.model.generate_content(prompt)
-            return response.text.strip()
+            return self._generate_content(prompt)
         except Exception as e:
-            # Fallback to base feedback on error
             print(f"LLM API error: {e}")
             return base_feedback
-    
+
     def _build_feedback_prompt(
         self,
         step_prompt: str,
@@ -80,7 +88,7 @@ class LLMService:
     ) -> str:
         """Build the prompt for feedback generation."""
         status = "正确" if is_correct else "错误"
-        
+
         prompt = f"""{self.system_prompt}
 
 ---
@@ -95,9 +103,9 @@ class LLMService:
 - 如果错误：指出逻辑问题，但不要透露正确答案
 
 回复："""
-        
+
         return prompt
-    
+
     def generate_transfer_prompt(
         self,
         original_question: Dict,
@@ -105,17 +113,10 @@ class LLMService:
     ) -> str:
         """
         Generate a transfer question with reduced guidance.
-        
-        Args:
-            original_question: The original question data
-            student_performance: Student's performance on original question
-            
-        Returns:
-            A new question prompt with same structure but less guidance
         """
         if not self.is_configured():
             return "（迁移题目生成需要配置 API）"
-        
+
         try:
             prompt = f"""{self.system_prompt}
 
@@ -135,48 +136,34 @@ class LLMService:
 - 减少引导，让学生更独立思考
 
 迁移题目："""
-            
-            response = self.model.generate_content(prompt)
-            return response.text.strip()
+
+            return self._generate_content(prompt)
         except Exception as e:
             print(f"LLM API error: {e}")
             return "（迁移题目生成失败，请检查 API 配置）"
-    
+
     def chat(
         self,
         messages: List[Dict[str, str]],
         temperature: float = 0.7
     ) -> str:
         """
-        General chat interface for more flexible interactions.
-        
-        Args:
-            messages: List of message dicts with 'role' and 'content'
-            temperature: Response temperature (0.0-1.0)
-            
-        Returns:
-            AI response text
+        General chat: 将 system + 用户消息拼成单条 prompt，一次 REST 调用。
         """
         if not self.is_configured():
             return "（API 未配置，请设置 GEMINI_API_KEY）"
-        
+
         try:
-            # Build chat history
-            chat_model = self.model.start_chat(history=[])
-            
-            # Add system prompt as first message
+            parts = []
             if self.system_prompt:
-                chat_model.send_message(f"[System Instructions]\n{self.system_prompt}")
-            
-            response = None
-            # Process messages
+                parts.append(f"[System Instructions]\n{self.system_prompt}\n\n")
             for msg in messages:
-                if msg["role"] == "user":
-                    response = chat_model.send_message(msg["content"])
-            
-            if response:
-                return response.text.strip()
-            return ""
+                if msg.get("role") == "user":
+                    parts.append(msg.get("content", ""))
+            prompt = "\n".join(parts).strip()
+            if not prompt:
+                return ""
+            return self._generate_content(prompt)
         except Exception as e:
             print(f"LLM API error (chat): {e}")
             return f"（API 调用失败：{str(e)}）"
@@ -189,16 +176,13 @@ class LLMService:
     ) -> Dict[str, str]:
         """
         Analyze student's reasoning and provide feedback + standard solution.
-        
-        Returns:
-            Dict containing 'evaluation' and 'standard_solution'
         """
         if not self.is_configured():
             return {
                 "evaluation": "（API 未配置，无法评价）",
                 "standard_solution": "（API 未配置，无法生成解析）"
             }
-            
+
         try:
             prompt = f"""
 请作为物理导师，评价学生关于这道题的解题思路，并提供标准解析。
@@ -216,45 +200,31 @@ class LLMService:
     "standard_solution": "清晰的标准解题步骤和解析"
 }}
 """
-            # If image is provided, we would handle it here (Gemini supports verification).
-            # For MVP simplicity, we might just pass text.
-            # But the tool supports image inputs if we use the right method.
-            # Assuming text-only for now unless `student_image` handles base64/url
-            
-            response = self.model.generate_content(prompt)
-            text = response.text.strip()
-            
-            # Simple cleanup for json
+            text = self._generate_content(prompt)
+
             if text.startswith("```json"):
                 text = text.replace("```json", "").replace("```", "")
             elif text.startswith("```"):
                 text = text.replace("```", "")
-            
-            import json
+
             try:
                 result = json.loads(text)
-                
-                # Robustness check: Ensure required fields are present and are strings
-                # Some models might return nested objects for 'standard_solution'
                 for field in ["evaluation", "standard_solution"]:
                     val = result.get(field)
                     if val is None:
                         result[field] = ""
                     elif not isinstance(val, str):
-                        # Convert nested structures to formatted string if necessary
                         if isinstance(val, (dict, list)):
                             result[field] = json.dumps(val, indent=2, ensure_ascii=False)
                         else:
                             result[field] = str(val)
-                
                 return result
             except json.JSONDecodeError:
-                # Fallback if json parsing fails
                 return {
                     "evaluation": text,
                     "standard_solution": "（解析生成格式异常，请查看上方点评）"
                 }
-                
+
         except Exception as e:
             print(f"LLM API error (analyze): {e}")
             return {

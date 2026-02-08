@@ -1,0 +1,5 @@
+# PhysiTutor-AI
+User-agent: *
+Allow: /
+
+Sitemap: /
