@@ -25,3 +25,5 @@
 {"session_id": "sess_053f7873", "question_id": "soybean_machine_01", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 3, "duration_seconds": null, "completed_at": "2026-02-10T10:59:50.847514"}
 {"session_id": "sess_6e567dd4", "question_id": "light_reflection_01", "total_steps": 5, "correct_count": 5, "accuracy": 1.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-10T11:07:19.282225"}
 {"session_id": "sess_37ee5c4e", "question_id": "water_tank_valve_01", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 1, "duration_seconds": null, "completed_at": "2026-02-10T11:17:15.022965"}
+{"session_id": "sess_3208d314", "question_id": "photo_19c75662", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-10T11:31:12.975551"}
+{"session_id": "sess_39facebe", "question_id": "transfer_sess_3208d314", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 1, "duration_seconds": null, "completed_at": "2026-02-10T11:32:31.868058"}

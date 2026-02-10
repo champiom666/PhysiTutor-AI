@@ -9,6 +9,8 @@
 ### 核心机制
 
 - 📋 把物理题拆成若干**关键判断步骤**
+- 📷 **拍照解题**：通过 Vision 模型识别物理题目，自动生成引导步骤
+- 🤖 **多模型支持**：无缝切换 Google Gemini 和 Zhipu AI (GLM-4)
 - ✋ 每一步**强制学生做选择**
 - 💬 AI 只对"判断是否合理"做反馈
 - 🎯 逐步引导学生形成解题路径
@@ -42,12 +44,27 @@ pip install -r requirements.txt
 
 ### 2. 配置环境变量
 
+本项目使用 `.env` 文件统一管理配置。
+
 ```bash
 # 复制环境变量模板
 copy .env.example .env
+```
 
-# 编辑 .env 文件，填入你的 Gemini API Key
-# GEMINI_API_KEY=your_api_key_here
+编辑 `.env` 文件，填入你的 API Key 和模型配置：
+
+```ini
+# 选择 LLM 提供商 (gemini 或 zhipu)
+LLM_PROVIDER=gemini
+
+# Gemini 配置
+GEMINI_API_KEY=your_gemini_key
+GEMINI_MODEL=gemini-1.5-flash
+
+# Zhipu AI (智谱) 配置
+ZHIPU_API_KEY=your_zhipu_key
+ZHIPU_MODEL=glm-4-flash
+ZHIPU_VISION_MODEL=glm-4v-flash
 ```
 
 ### 3. 启动服务
@@ -69,6 +86,18 @@ uvicorn app.main:app --reload --port 8000 --host 0.0.0.0
 ## API 使用示例
 
 ### 完整对话流程
+
+### 📸 拍照解题
+
+上传题目图片，自动分析并开启会话：
+
+```bash
+curl -X POST http://localhost:8000/session/analyze-image \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@/path/to/question.jpg"
+```
+
+### 💬 文本对话流程
 
 ```bash
 # 1. 查看可用题目

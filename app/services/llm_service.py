@@ -381,8 +381,13 @@ class LLMService:
                     if val is None:
                         result[field] = ""
                     elif not isinstance(val, str):
-                        if isinstance(val, (dict, list)):
-                            result[field] = json.dumps(val, indent=2, ensure_ascii=False)
+                        if isinstance(val, dict):
+                            lines = []
+                            for k, v in val.items():
+                                lines.append(f"{k}：{v}")
+                            result[field] = "\n".join(lines)
+                        elif isinstance(val, list):
+                            result[field] = "\n".join([str(x) for x in val])
                         else:
                             result[field] = str(val)
                 return result
