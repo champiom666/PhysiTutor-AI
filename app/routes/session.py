@@ -86,9 +86,9 @@ async def list_questions():
     """
     List all available questions.
     
-    Returns a list of question IDs that can be used to start a session.
+    Returns a list of questions with detailed information (id, topic, difficulty).
     """
-    questions = dialogue_manager.get_available_questions()
+    questions = dialogue_manager.get_available_questions_with_info()
     return {
         "available_questions": questions,
         "count": len(questions)

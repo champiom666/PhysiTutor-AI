@@ -7,6 +7,7 @@
     <title>PhysiTutor AI - 物理思维导师</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
         :root {
             --primary: #6366f1;
@@ -778,7 +779,7 @@
                 <div class="context-image" id="contextImageContainer" style="display: none;">
                     <img id="contextImage" src="" alt="题目图片">
                 </div>
-                <p class="context-text" id="contextText"></p>
+                <div class="context-text" id="contextText"></div>
             </div>
 
             <!-- Step Card -->
@@ -887,18 +888,24 @@
                 <!-- Filled by JS -->
             </div>
 
-            <div class="action-buttons" style="justify-content: center;">
+            <div class="action-buttons" style="justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
                 <button class="btn btn-secondary"
                     onclick="document.getElementById('reasoningInput').focus(); showReasoningScreen();">
                     <span>没理解透，重新说明</span>
                 </button>
-                <button class="btn btn-primary" onclick="startTransfer()">
-                    <span>已经理解，再练一道</span>
+                <button class="btn btn-primary" id="transferBtn" onclick="startTransfer()">
+                    <span id="transferBtnText">已理解，再出一道类似的题目</span>
+                </button>
+                <button class="btn btn-secondary" onclick="goToNextQuestion()">
+                    <span>进入下一道题目</span>
                 </button>
             </div>
         </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         // API Base URL
         const API_BASE = '';  // Same origin
@@ -978,6 +985,8 @@
 
                 elements.loadingQuestions.style.display = 'none';
 
+                console.log('Loaded questions:', data); // Debug log
+
                 if (data.available_questions && data.available_questions.length > 0) {
                     renderQuestionList(data.available_questions);
                 } else {
@@ -991,16 +1000,27 @@
         }
 
         function renderQuestionList(questions) {
-            const html = questions.map((qId, index) => `
-                <div class="question-card" onclick="startSession('${qId}')">
-                    <div class="question-number">${index + 1}</div>
-                    <div class="question-info">
-                        <h3>${formatQuestionId(qId)}</h3>
-                        <p>物理综合题 · 引导式学习</p>
+            console.log('Rendering questions:', questions); // Debug log
+            
+            const html = questions.map((q, index) => {
+                // Support both old format (just ID string) and new format (object with id, topic, difficulty)
+                const questionId = typeof q === 'string' ? q : (q.id || q);
+                const topic = typeof q === 'string' ? '物理综合题' : (q.topic || '物理综合题');
+                const difficulty = typeof q === 'string' ? '中考压轴' : (q.difficulty || '中考');
+                
+                console.log(`Question ${index + 1}:`, { questionId, topic, difficulty }); // Debug log
+                
+                return `
+                    <div class="question-card" onclick="startSession('${questionId}')">
+                        <div class="question-number">${index + 1}</div>
+                        <div class="question-info">
+                            <h3>${topic}</h3>
+                            <p>引导式学习</p>
+                        </div>
+                        <span class="difficulty-badge">${difficulty}</span>
                     </div>
-                    <span class="difficulty-badge">中考压轴</span>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             elements.questionList.innerHTML = html;
         }
@@ -1010,6 +1030,62 @@
             return id.split('_').map(word =>
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
+        }
+
+        /** 将题目描述中的常见物理/数学记号转为 LaTeX，渲染后若为类似题则以整块图片展示 */
+        function setContextWithLatex(rawContext, showAsImage) {
+            if (!rawContext) return;
+
+            function escapeHtml(s) {
+                const div = document.createElement('div');
+                div.textContent = s;
+                return div.innerHTML;
+            }
+
+            let s = escapeHtml(rawContext);
+            // 数字×10^指数 → LaTeX（指数保留负号用 $2）
+            s = s.replace(/(\d)×10\^(-?\d+)/g, '\\($1\\\\times 10^{$2}\\)');
+            s = s.replace(/(\d)×10\^(\d+)/g, '\\($1\\\\times 10^{$2}\\)');
+            // △ → Delta
+            s = s.replace(/△/g, '\\(\\\\Delta\\)');
+            // _下标（容、水、桌、底等）
+            s = s.replace(/_(容|水|桌|底|压|强)/g, '\\(_{\\\\text{$1}}\\)');
+            s = s.replace(/_(Pa)/g, '\\(_{\\\\text{$1}}\\)');
+            // 米²、米2
+            s = s.replace(/米²/g, '米\\(^2\\)');
+            s = s.replace(/米2/g, '米\\(^2\\)');
+            s = s.replace(/\n/g, '<br>');
+
+            const el = elements.contextText;
+            el.innerHTML = s;
+
+            if (typeof renderMathInElement === 'undefined') {
+                el.textContent = rawContext;
+                return;
+            }
+            renderMathInElement(el, {
+                delimiters: [{ left: '\\(', right: '\\)', display: false }, { left: '\\[', right: '\\]', display: true }],
+                throwOnError: false
+            });
+
+            if (showAsImage && typeof html2canvas !== 'undefined') {
+                setTimeout(function () {
+                    html2canvas(elements.contextCard, {
+                        useCORS: true,
+                        scale: 2,
+                        backgroundColor: null,
+                        logging: false
+                    }).then(function (canvas) {
+                        el.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = canvas.toDataURL('image/png');
+                        img.alt = '题目';
+                        img.style.maxWidth = '100%';
+                        img.style.borderRadius = 'var(--border-radius, 8px)';
+                        el.appendChild(img);
+                    }).catch(function () { /* 若截图失败则保留 KaTeX 渲染 */ });
+                }, 300);
+            }
         }
 
         async function startSession(questionId) {
@@ -1050,17 +1126,17 @@
                 elements.loadingStep.style.display = 'none';
 
                 state.currentStep = data.step_id;
-                state.totalSteps = 6; // Default, will be updated
+                state.totalSteps = data.total_steps != null ? data.total_steps : 6;
 
                 // Update context (only show on first step)
                 // Update context and image (only show on first step)
                 if (data.context || data.image) {
                     elements.contextCard.style.display = 'block';
 
-                    // Handle description
+                    // Handle description (with LaTeX; for transfer questions render then show as image)
                     if (data.context) {
-                        elements.contextText.textContent = data.context;
                         elements.contextText.style.display = 'block';
+                        setContextWithLatex(data.context, (state.questionId || '').indexOf('transfer_') === 0);
                     } else {
                         elements.contextText.style.display = 'none';
                     }
@@ -1085,7 +1161,7 @@
                 elements.stepPrompt.textContent = data.prompt;
 
                 // Update progress
-                updateProgress(data.step_id, 6);
+                updateProgress(data.step_id, state.totalSteps);
 
                 // Render options
                 renderOptions(data.options);
@@ -1304,24 +1380,29 @@
         }
 
         async function startTransfer() {
+            const btn = document.getElementById('transferBtn');
+            const btnText = document.getElementById('transferBtnText');
+            if (btn) btn.disabled = true;
+            if (btnText) btnText.textContent = '正在生成类似题目…';
             try {
                 const response = await fetch(`${API_BASE}/dialogue/${state.sessionId}/transfer`, {
                     method: 'POST'
                 });
 
-                if (!response.ok) {
-                    throw new Error('Transfer failed');
-                }
-
-                const data = await response.json();
-                if (data.next_question_id) {
+                const data = await response.json().catch(() => ({}));
+                if (response.ok && data.next_question_id) {
                     startSession(data.next_question_id);
-                } else {
+                } else if (response.ok) {
                     alert('暂无更多相似题目');
+                } else {
+                    alert(data.detail || '启动下一题失败，请重试');
                 }
             } catch (error) {
                 console.error('Error starting transfer:', error);
                 alert('启动下一题失败，请检查网络');
+            } finally {
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.textContent = '已理解，再出一道类似的题目';
             }
         }
 
@@ -1345,6 +1426,11 @@
         }
 
         function restart() {
+            quitSession();
+        }
+
+        /** 从分析页进入题目列表，选下一道题 */
+        function goToNextQuestion() {
             quitSession();
         }
     </script>

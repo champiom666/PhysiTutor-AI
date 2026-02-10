@@ -2,6 +2,7 @@
 PhysiTutor-AI Dialogue Manager
 Controls the step-by-step guided dialogue flow.
 """
+import base64
 import json
 import time
 from datetime import datetime
@@ -66,6 +67,23 @@ class DialogueManager:
         """Get list of available question IDs."""
         return list(self.questions.keys())
     
+    def get_available_questions_with_info(self) -> list:
+        """Get list of available questions with detailed information."""
+        result = []
+        # Sort by question ID to ensure consistent ordering
+        for question_id in sorted(self.questions.keys()):
+            question = self.questions[question_id]
+            result.append({
+                "id": question.id,
+                "topic": question.topic,
+                "difficulty": question.difficulty
+            })
+        return result
+
+    def register_question(self, question: Question) -> None:
+        """注册一道题目到内存（如 AI 生成的类似题）。"""
+        self.questions[question.id] = question
+
     def create_session(
         self,
         question_id: str,
@@ -154,6 +172,7 @@ class DialogueManager:
             options=current_step.options,
             image=image,
             context=context,
+            total_steps=session.total_steps,
             is_transfer_mode=session.status == "transfer_mode",
             is_reasoning_mode=session.status == "reasoning"
         )
@@ -309,7 +328,50 @@ class DialogueManager:
             return next_question_id
         
         return None
-    
+
+    def start_transfer_question_with_ai(self, session_id: str) -> Optional[str]:
+        """
+        用 Gemini 根据原题图片和题目信息生成一道思路类似的新题，并创建新会话。
+        要求会话处于 transfer_mode 或 completed。
+        
+        Returns:
+            新题目的 question_id，失败返回 None。
+        """
+        session = self.sessions.get(session_id)
+        if not session or session.status not in ("transfer_mode", "completed"):
+            return None
+
+        question = self.questions.get(session.question_id)
+        if not question:
+            return None
+
+        image_base64 = ""
+        mime_type = "image/png"
+        if question.image:
+            image_path = Path(settings.PROJECT_ROOT) / question.image.lstrip("/")
+            if image_path.exists():
+                try:
+                    with open(image_path, "rb") as f:
+                        image_base64 = base64.b64encode(f.read()).decode()
+                    mime_type = "image/png" if image_path.suffix.lower() == ".png" else "image/jpeg"
+                except Exception as e:
+                    print(f"Error reading question image: {e}")
+
+        data = llm_service.generate_similar_question(
+            question=question,
+            image_base64=image_base64,
+            mime_type=mime_type,
+        )
+        if not data:
+            return None
+
+        new_id = f"transfer_{session_id}"
+        data["id"] = new_id
+        new_question = Question(**data)
+        self.register_question(new_question)
+        # 不在此处 create_session，由前端 startSession(next_question_id) 时创建
+        return new_id
+
     def submit_reasoning(
         self,
         session_id: str,

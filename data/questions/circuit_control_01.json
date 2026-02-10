@@ -1,0 +1,63 @@
+{
+  "id": "circuit_control_01",
+  "topic": "简单电路设计 · 门禁控制",
+  "difficulty": "中考",
+  "image": "/static/images/question_03.png",
+  "question_context": {
+    "description": "疫情期间小区安装门禁系统（如图甲）。系统用电子眼识别车辆：若是小区内车辆，由自动开关 S1 控制电动机 M 抬起道闸；若是外来车辆，需工作人员按下按钮开关 S2 控制电动机 M 抬起道闸。请根据描述在图乙中完成电路连接。",
+    "ask": [
+      "① 根据题意补全图乙中的模拟电路图，使 S1 或 S2 都能独立控制电动机 M 工作。"
+    ]
+  },
+  "guided_steps": [
+    {
+      "step_id": 1,
+      "type": "concept_judgement",
+      "prompt": "「内车用 S1 控制，外车用 S2 控制」且都能让电机工作，说明 S1 和 S2 在电路中的关系应是？",
+      "options": [
+        "A. 闭合其中一个就能让电机工作",
+        "B. 必须同时闭合电机才工作",
+        "C. S1 和 S2 串联",
+        "D. 只能用一个开关"
+      ],
+      "correct": "A",
+      "feedback": {
+        "correct": "对。内车只用到 S1，外车只用到 S2，所以两个开关应能「各自独立」使电机工作。",
+        "incorrect": "内车和外车是两种不同情况，不会同时用两个开关，所以闭合任一个就应能让电机转。"
+      }
+    },
+    {
+      "step_id": 2,
+      "type": "model_judgement",
+      "prompt": "要满足「闭合 S1 或闭合 S2 都能使电机 M 工作」，S1 和 S2 应如何与 M 连接？",
+      "options": [
+        "A. S1、S2 与 M 串联",
+        "B. M 与 S1 串联、M 与 S2 串联，两条支路再并联",
+        "C. S1 与 S2 并联后，再与 M 串联",
+        "D. S1、S2 与 M 全部并联"
+      ],
+      "correct": "C",
+      "feedback": {
+        "correct": "正确。两个开关并联后与电机串联：闭合 S1 或 S2 任一个，电流都能经过电机。",
+        "incorrect": "并联的开关是「或」的关系：任意一个闭合，电路就通。串联才是「都要闭合」。"
+      }
+    },
+    {
+      "step_id": 3,
+      "type": "direction_judgement",
+      "prompt": "在补全电路时，电源、开关和电机 M 应形成怎样的回路？",
+      "options": [
+        "A. 电源正极 → (S1 与 S2 并联) → M → 电源负极",
+        "B. 电源正极 → S1 和 S2 → M → 电源负极",
+        "C. 电源正极 → M → S1 与 S2 并联 → 电源负极",
+        "D. S1、S2、M 三者并联在电源两端"
+      ],
+      "correct": "A",
+      "feedback": {
+        "correct": "对。电流从正极出来，经过并联的 S1、S2（任一路闭合即可），再经过 M 回到负极。",
+        "incorrect": "开关要能「控制」电机，必须和电机在一条回路里，且 S1、S2 并联实现「或」的关系。"
+      }
+    }
+  ],
+  "next_similar_question_id": null
+}

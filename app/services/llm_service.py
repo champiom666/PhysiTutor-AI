@@ -5,7 +5,10 @@ PhysiTutor-AI Gemini API Service
 import json
 import requests
 from requests.adapters import HTTPAdapter
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.schemas import Question
 from urllib3.util.retry import Retry
 
 from config.settings import settings, get_system_prompt
@@ -35,6 +38,47 @@ def _call_gemini_rest(api_key: str, model: str, prompt: str, timeout: int = GEMI
     resp.raise_for_status()
     result = resp.json()
     return result["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+
+def _call_gemini_rest_with_image(
+    api_key: str,
+    model: str,
+    prompt: str,
+    image_base64: str,
+    mime_type: str = "image/png",
+    timeout: int = GEMINI_TIMEOUT,
+) -> str:
+    """REST 调用 Gemini generateContent，带图片（inline_data）。"""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    headers = {"Content-Type": "application/json", "X-goog-api-key": api_key}
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"inlineData": {"mimeType": mime_type, "data": image_base64}},
+                    {"text": prompt},
+                ]
+            }
+        ]
+    }
+
+    session = requests.Session()
+    retry = Retry(
+        total=2,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["POST"],
+    )
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+
+    resp = session.post(url, headers=headers, json=payload, timeout=timeout)
+    resp.raise_for_status()
+    result = resp.json()
+    parts = result["candidates"][0]["content"]["parts"]
+    for p in parts:
+        if "text" in p:
+            return p["text"].strip()
+    return ""
 
 
 class LLMService:
@@ -231,6 +275,110 @@ class LLMService:
                 "evaluation": "（评价生成失败，请稍后重试）",
                 "standard_solution": "（解析生成失败）"
             }
+
+    def generate_similar_question(
+        self,
+        question: "Question",
+        image_base64: str,
+        mime_type: str = "image/png",
+    ) -> Optional[Dict]:
+        """
+        根据原题图片和题目信息，让 Gemini 出一道思路类似但情境/数值不同的题目，
+        用于考察学生是否真正掌握。返回可构造 Question 的 dict，失败返回 None。
+        """
+        if not self.is_configured():
+            return None
+
+        try:
+            ctx = question.question_context
+            prompt = f"""你是一位初中物理出题老师。请根据下面这张原题图片和题目信息，出一道「思路类似但情境或数值不完全一样」的新题，用于考察学生是否真正学会了解题思路。
+
+【原题信息】
+主题：{question.topic}
+难度：{question.difficulty}
+描述：{ctx.description}
+问题：{chr(10).join(ctx.ask)}
+
+【要求】
+1. 新题考查的物理概念和解题逻辑与原题一致（如液体压强、固体压强、浮沉等）。
+2. 改变具体情境或数值（如容器尺寸、质量、液体种类等），不要照抄原题。
+3. 新题仍为多步引导式，包含若干「判断步骤」，每步有 prompt、选项 A/B/C/D、正确答案、正确/错误反馈。
+4. 必须返回合法 JSON，不要包含 markdown 代码块标记，直接以 {{ 开头、}} 结尾。
+
+【返回 JSON 格式】
+{{
+  "question_context": {{
+    "description": "新题的题干描述（含情境与已知量）",
+    "ask": ["① 第一问", "② 第二问", "③ 第三问"]
+  }},
+  "guided_steps": [
+    {{
+      "step_id": 1,
+      "type": "concept_judgement",
+      "prompt": "第一步的判断问题",
+      "options": ["A. 选项A", "B. 选项B", "C. 选项C", "D. 选项D"],
+      "correct": "B",
+      "feedback": {{
+        "correct": "正确时的简短反馈",
+        "incorrect": "错误时的简短引导"
+      }}
+    }}
+  ]
+}}
+
+请只输出上述 JSON，不要其他说明。"""
+
+            if image_base64:
+                text = _call_gemini_rest_with_image(
+                    self.api_key,
+                    self.model_name,
+                    prompt,
+                    image_base64,
+                    mime_type=mime_type,
+                    timeout=self.timeout,
+                )
+            else:
+                text = self._generate_content(prompt)
+
+            if text.startswith("```"):
+                text = text.split("```")[1]
+                if text.startswith("json"):
+                    text = text[4:]
+            text = text.strip()
+
+            raw = json.loads(text)
+            qc = raw.get("question_context") or {}
+            steps = raw.get("guided_steps") or []
+            if not qc or not steps:
+                return None
+
+            return {
+                "topic": question.topic,
+                "difficulty": question.difficulty,
+                "image": question.image,
+                "question_context": {
+                    "description": qc.get("description", ""),
+                    "ask": qc.get("ask") or [],
+                },
+                "guided_steps": [
+                    {
+                        "step_id": s.get("step_id", i + 1),
+                        "type": s.get("type", "concept_judgement"),
+                        "prompt": s.get("prompt", ""),
+                        "options": s.get("options") or [],
+                        "correct": s.get("correct", "A"),
+                        "feedback": {
+                            "correct": (s.get("feedback") or {}).get("correct", ""),
+                            "incorrect": (s.get("feedback") or {}).get("incorrect", ""),
+                        },
+                    }
+                    for i, s in enumerate(steps)
+                ],
+                "next_similar_question_id": None,
+            }
+        except Exception as e:
+            print(f"LLM API error (generate_similar_question): {e}")
+            return None
 
 
 # Global LLM service instance

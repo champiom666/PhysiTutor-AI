@@ -84,6 +84,7 @@ class CurrentStepResponse(BaseModel):
     options: List[str]
     image: Optional[str] = None
     context: Optional[str] = None  # Question context
+    total_steps: int = 6  # 本题总步数，用于进度条
     is_transfer_mode: bool = False
     is_reasoning_mode: bool = False  # New flag for reasoning phase
 

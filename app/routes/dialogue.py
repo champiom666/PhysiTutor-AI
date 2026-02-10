@@ -105,27 +105,26 @@ async def get_dialogue_history(session_id: str):
 @router.post("/{session_id}/transfer")
 async def start_transfer(session_id: str):
     """
-    Start the transfer verification question.
+    启动「类似题」：优先用配置的下一题，否则调用 Gemini 根据原题图片生成一道思路类似的新题。
     
-    After completing all guided steps, the student can move to a
-    similar question with reduced guidance to verify learning.
+    - **session_id**: 会话 ID（须为 transfer_mode 或 completed）
     
-    - **session_id**: The session ID (must be in transfer_mode)
-    
-    Returns the ID of the transfer question if available.
+    返回 next_question_id（新题 ID）或 null（生成失败/无下一题）。
     """
     next_question = dialogue_manager.start_transfer_question(session_id)
-    
     if not next_question:
-        raise HTTPException(
-            status_code=400,
-            detail="Transfer question not available. Session must be in transfer_mode."
-        )
-    
+        next_question = dialogue_manager.start_transfer_question_with_ai(session_id)
+
+    if next_question:
+        return {
+            "message": "Transfer question ready",
+            "next_question_id": next_question,
+            "hint": f"Start new session with question_id='{next_question}' for transfer verification"
+        }
     return {
-        "message": "Transfer question ready",
-        "next_question_id": next_question,
-        "hint": f"Start new session with question_id='{next_question}' for transfer verification"
+        "message": "No similar question available",
+        "next_question_id": None,
+        "hint": "Failed to generate or find a similar question."
     }
 
 

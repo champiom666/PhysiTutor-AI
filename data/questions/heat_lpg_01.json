@@ -1,0 +1,80 @@
+{
+  "id": "heat_lpg_01",
+  "topic": "热量计算 · 燃料燃烧与热效率",
+  "difficulty": "中考",
+  "image": "/static/images/question_04.png",
+  "question_context": {
+    "description": "家用瓶装液化气，若每瓶装入 12 kg 液化气，液化气热值取 4.2×10⁷ J/kg。则每瓶液化气全部燃烧放出的热量是多少？若放出的热量有 40% 被利用，在标准大气压下可把多少 kg 的水从 20℃ 加热至沸腾？（c水=4.2×10³ J/(kg·℃)）",
+    "ask": [
+      "① 每瓶液化气完全燃烧放出的热量 Q 放（单位：J）",
+      "② 在标准大气压下，可把多少 kg 的水从 20℃ 加热至沸腾？"
+    ]
+  },
+  "guided_steps": [
+    {
+      "step_id": 1,
+      "type": "model_judgement",
+      "prompt": "求「燃料完全燃烧放出的热量」应选用哪个公式？",
+      "options": [
+        "A. Q = qm（或 Q 放 = qm）",
+        "B. Q = cmΔt",
+        "C. Q = Pt",
+        "D. η = Q吸 / Q放"
+      ],
+      "correct": "A",
+      "feedback": {
+        "correct": "对。燃料完全燃烧放出的热量 Q放 = qm，其中 q 为热值，m 为质量。",
+        "incorrect": "热值 q 的含义是「单位质量的燃料完全燃烧放出的热量」，所以 Q放 = qm。"
+      }
+    },
+    {
+      "step_id": 2,
+      "type": "concept_judgement",
+      "prompt": "题目中「放出的热量有 40% 被利用」中的 40% 是指？",
+      "options": [
+        "A. 水吸收的热量占燃烧放出热量的 40%",
+        "B. 燃烧放出的热量占 40%",
+        "C. 热效率为 60%",
+        "D. 水升温 40℃"
+      ],
+      "correct": "A",
+      "feedback": {
+        "correct": "正确。被利用的热量就是被水吸收的热量，Q吸 = η·Q放 = 40%×Q放。",
+        "incorrect": "「被利用」指的是被水吸收用来升温的那部分，所以 Q吸 = 40% × Q放。"
+      }
+    },
+    {
+      "step_id": 3,
+      "type": "model_judgement",
+      "prompt": "求「能把多少 kg 的水从 20℃ 加热到沸腾」，需要用到哪个公式？",
+      "options": [
+        "A. Q放 = qm",
+        "B. Q吸 = cmΔt",
+        "C. η = Q吸 / Q放",
+        "D. 以上都要用"
+      ],
+      "correct": "D",
+      "feedback": {
+        "correct": "对。先由 Q放 = qm 求放热，再 Q吸 = η·Q放，最后由 Q吸 = cmΔt 求水的质量 m水。",
+        "incorrect": "链条是：Q放 → Q吸 = η·Q放 → Q吸 = c水 m水 Δt，求 m水。"
+      }
+    },
+    {
+      "step_id": 4,
+      "type": "concept_judgement",
+      "prompt": "标准大气压下水的沸点是多少？因此从 20℃ 加热到沸腾，Δt 应取多少？",
+      "options": [
+        "A. 沸点 100℃，Δt = 100℃",
+        "B. 沸点 90℃，Δt = 70℃",
+        "C. 沸点 100℃，Δt = 80℃",
+        "D. 沸点 100℃，Δt = 120℃"
+      ],
+      "correct": "C",
+      "feedback": {
+        "correct": "正确。标准大气压下沸点 100℃，Δt = 100℃ - 20℃ = 80℃。",
+        "incorrect": "标准大气压下水的沸点是 100℃；Δt = 末温 - 初温。"
+      }
+    }
+  ],
+  "next_similar_question_id": null
+}
