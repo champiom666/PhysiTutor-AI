@@ -1,0 +1,81 @@
+{
+    "id": "conveyor_mechanics_01",
+    "topic": "机械功与功率 · 传送带问题",
+    "difficulty": "中考",
+    "image": "/static/images/question_07.png",
+    "question_context": {
+        "description": "（2012年四川宜宾卷·第18题·12分）如图所示，是小明同学为宜宾港设计的一个货物运送装置图，其中AB是长L=10 m的传送带，BC是平台，AB两端的高度差h=2.5 m，传送带在电动机M的带动下顺时针匀速转动。现有一质量m=547.2 kg的货物，从A端随传送带一起匀速地被运送到平台BC上，传送带运行的速度v=4 m/s。由于轮轴等方面的摩擦，电动机输出功(转化为机械功)的效率η=80%，电动机允许通过的最大电流为25 A。取g=10 N/kg。求：\n（1）要使该货物从A端运送到B端，电动机需要工作多少时间？\n（2）货物从A端运送到B端，需克服重力做多少功？电动机的输出功率是多大？\n（3）如果电动机接在电压U=380 V不变的电源上，电动机中线圈的电阻r=1.9Ω，在把货物从A端运送到B端的过程中，电动机消耗的电能是多少？",
+        "ask": [
+            "① 电动机需要工作多少时间？",
+            "② 需克服重力做多少功？电动机的输出功率是多大？",
+            "③ 电动机消耗的电能是多少？"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "model_judgement",
+            "prompt": "货物从A端运送到B端，运动的距离s等于多少？",
+            "options": [
+                "A. s = h = 2.5m（高度差）",
+                "B. s = L = 10m（传送带长度）",
+                "C. s = √(L²+h²)",
+                "D. 无法确定"
+            ],
+            "correct": "B",
+            "feedback": {
+                "correct": "对。货物沿传送带从A到B，运动距离就是传送带长度L=10m。",
+                "incorrect": "货物是沿着传送带运动的，运动距离等于传送带长度。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "model_judgement",
+            "prompt": "已知传送带匀速运动v=4m/s，货物随传送带一起匀速运动距离s=10m，求时间用什么公式？",
+            "options": [
+                "A. t = s/v",
+                "B. t = v/s",
+                "C. t = W/P",
+                "D. t = mgh/P"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。匀速运动，t = s/v = 10m ÷ 4m/s = 2.5s。",
+                "incorrect": "匀速运动的基本公式：v = s/t，所以 t = s/v。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "concept_judgement",
+            "prompt": "货物从A端上升到B端，克服重力做的功（有用功）应该怎么计算？",
+            "options": [
+                "A. W有用 = mgh（h是高度差）",
+                "B. W有用 = mgL（L是传送带长度）",
+                "C. W有用 = Fv",
+                "D. W有用 = Pt"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。克服重力做功 W = mgh，其中h=2.5m是竖直高度。",
+                "incorrect": "克服重力做功只与竖直高度有关：W = mgh。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "direction_judgement",
+            "prompt": "题目给出「电动机输出功的效率η=80%」，这个效率是指？",
+            "options": [
+                "A. η = W有用 / W输出 = mgh / W输出",
+                "B. η = W输出 / W电",
+                "C. η = P输出 / P电",
+                "D. 以上都不对"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。输出功的效率 = 有用功/输出功，80% = mgh / W输出。",
+                "incorrect": "效率η=80%是指有用功（克服重力做功）占输出功的比例。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}

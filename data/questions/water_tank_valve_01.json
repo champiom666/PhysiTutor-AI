@@ -1,0 +1,82 @@
+{
+    "id": "water_tank_valve_01",
+    "topic": "浮力与压强 · 水箱自动控制",
+    "difficulty": "中考",
+    "image": "/static/images/question_10.png",
+    "question_context": {
+        "description": "（2012年广西南宁卷·第30题·11分）如图所示，是某课外科技小组同学设计的厕所自动冲水装置的示意图。它在自来水管持续供给的较小流量的水储备到一定量后，自动开启放水阀门，冲洗厕所。实心圆柱体浮体A的质量为5.6 kg，高为0.18 m，阀门B的面积为7.5×10⁻³ m²，连接A、B的是体积和质量都不计的硬杆，长为0.16 m。当浮体A露出水面的高度只有0.02 m时，阀门B恰好被打开，水箱中的水通过排水管开始排出。已知水的密度为1×10³ kg/m³，不计阀门B的质量和厚度。当水箱开始排水时，求：（g取10 N/kg）\n（1）浮体A受到的重力；\n（2）水对阀门B的压强和压力；\n（3）浮体A受到的浮力；\n（4）浮体A的密度。",
+        "ask": [
+            "① 浮体A受到的重力",
+            "② 水对阀门B的压强和压力",
+            "③ 浮体A受到的浮力",
+            "④ 浮体A的密度"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "model_judgement",
+            "prompt": "已知浮体A质量m=5.6kg，求重力用什么公式？",
+            "options": [
+                "A. G = mg",
+                "B. G = ρVg",
+                "C. G = F浮",
+                "D. G = pS"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。G = mg = 5.6kg × 10N/kg = 56N。",
+                "incorrect": "已知质量，直接用 G = mg 计算。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "direction_judgement",
+            "prompt": "当阀门B恰好被打开时，浮体A露出水面0.02m，此时水深h应该是多少？",
+            "options": [
+                "A. h = 0.02m（露出部分）",
+                "B. h = 0.18m（浮体总高）",
+                "C. h = 0.18 - 0.02 + 0.16 = 0.32m",
+                "D. h = 0.18 - 0.02 = 0.16m"
+            ],
+            "correct": "C",
+            "feedback": {
+                "correct": "对。水深 = 浮体浸入深度 + 杆长 = (0.18-0.02) + 0.16 = 0.32m。",
+                "incorrect": "阀门在浮体下方，水深 = 浮体浸入部分 + 杆的长度。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "model_judgement",
+            "prompt": "水对阀门B的压强p应该用什么公式计算？",
+            "options": [
+                "A. p = ρ水gh（h是阀门所在深度）",
+                "B. p = F/S",
+                "C. p = mg/S",
+                "D. p = ρ浮体gh"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。液体压强 p = ρgh = 1×10³ × 10 × 0.32 = 3200Pa。",
+                "incorrect": "液体内部压强公式：p = ρ液gh。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "concept_judgement",
+            "prompt": "阀门B恰好被打开时，浮体A受力平衡。此时A受到哪些力？",
+            "options": [
+                "A. 重力G、浮力F浮、杆的拉力F杆",
+                "B. 只有重力和浮力",
+                "C. 重力、浮力、水的压力",
+                "D. 重力、浮力、杆的支持力"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。A受：重力G（向下）、浮力F浮（向上）、杆的拉力F杆（向下）。",
+                "incorrect": "浮体通过杆连接阀门，杆对浮体有作用力。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}

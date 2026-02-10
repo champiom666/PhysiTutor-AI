@@ -1,0 +1,82 @@
+{
+    "id": "raindrop_resistance_01",
+    "topic": "力与运动 · 空气阻力与匀速运动",
+    "difficulty": "中考",
+    "image": "/static/images/question_11.png",
+    "question_context": {
+        "description": "（2012年贵州遵义卷·第33题·8分）一重力G=2.5×10⁻³ N的雨滴从高空由静止开始竖直落下（不计横向风的影响），这雨滴下落过程中受到的空气阻力F阻与下落速度v的平方成正比，关系为F阻=kv²，其中k为常数，且k=1×10⁻¹ N·s²/m²。求：\n（1）该雨滴匀速下落时所受空气阻力的大小。\n（2）若雨滴匀速下落的距离为400 m，则这个过程重力对雨滴做的功为多少J？\n（3）雨滴匀速下落时的速度为多少？\n（4）请在右图中画出从开始下落到落地这一过程中雨滴的运动速度随时间变化的图象。（描绘出大致情况即可）",
+        "ask": [
+            "① 该雨滴匀速下落时所受空气阻力的大小",
+            "② 重力对雨滴做的功为多少J？",
+            "③ 雨滴匀速下落时的速度为多少？",
+            "④ 画出雨滴的运动速度随时间变化的图象"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "concept_judgement",
+            "prompt": "雨滴匀速下落时，受力情况如何？",
+            "options": [
+                "A. 只受重力",
+                "B. 重力大于阻力",
+                "C. 重力等于阻力",
+                "D. 重力小于阻力"
+            ],
+            "correct": "C",
+            "feedback": {
+                "correct": "正确。匀速运动，合力为零，所以重力=空气阻力。",
+                "incorrect": "匀速直线运动的条件是合力为零，所以F阻=G。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "model_judgement",
+            "prompt": "雨滴匀速下落距离s=400m，重力做功W应该用什么公式？",
+            "options": [
+                "A. W = Gs",
+                "B. W = Pt",
+                "C. W = Fv",
+                "D. W = mgh（h为高度）"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。重力做功 W = Gs = 2.5×10⁻³ × 400 = 1J。",
+                "incorrect": "功的基本公式：W = Fs，方向一致时直接相乘。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "direction_judgement",
+            "prompt": "已知F阻=kv²，匀速时F阻=G，求速度v的步骤是？",
+            "options": [
+                "A. kv² = G → v² = G/k → v = √(G/k)",
+                "B. v = G/k",
+                "C. v = k/G",
+                "D. v² = kG"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。由kv²=G求出v²，再开方得v。",
+                "incorrect": "匀速时G=kv²，解方程得 v = √(G/k)。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "concept_judgement",
+            "prompt": "雨滴从静止开始下落，速度如何变化？",
+            "options": [
+                "A. 先加速后匀速",
+                "B. 一直加速",
+                "C. 一直匀速",
+                "D. 先减速后匀速"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。开始时v小，阻力小，G>F阻，加速；后来F阻=G，匀速。",
+                "incorrect": "静止开始，阻力从0增大，当阻力=重力时达到匀速。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}

@@ -1,0 +1,80 @@
+{
+    "id": "car_transport_01",
+    "topic": "压强与功率 · 汽车运输",
+    "difficulty": "中考",
+    "image": "/static/images/question_09.png",
+    "question_context": {
+        "description": "汽车是我们熟悉的交通工具，某些单位为了减少运行成本甚至超载，导致路面损坏，某种型号运沙车的部分参数如下表，求：\n（1）若该车车厢内装有12m³的沙子，请你通过计算回答，汽车与否超载？此时汽车对水平路面的压强多大？（ρ沙=2.5×10³kg/m³）\n（2）已知沙场到建筑工地的距离为18.0 km，当该车满载时，以140kw的功率正常行驶，能否在2h内从沙场到建筑工地？（车受到的阻力为车重的0.02倍）",
+        "ask": [
+            "① 汽车是否超载？此时汽车对水平路面的压强多大？",
+            "② 能否在2h内从沙场到建筑工地？"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "model_judgement",
+            "prompt": "已知沙子体积V=12m³，密度ρ=2.5×10³kg/m³，求沙子质量用什么公式？",
+            "options": [
+                "A. m = ρV",
+                "B. m = V/ρ",
+                "C. m = ρ/V",
+                "D. m = G/g"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。质量 m = ρV = 2.5×10³ × 12 = 30000kg = 30t。",
+                "incorrect": "密度公式 ρ = m/V，所以 m = ρV。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "concept_judgement",
+            "prompt": "判断是否超载，应该比较什么？",
+            "options": [
+                "A. 沙子质量与载重的大小",
+                "B. 总质量（自重+沙子）与汽车总质量的大小",
+                "C. 压强与额定压强",
+                "D. 功率与额定功率"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。表中载重20t，沙子30t，30t > 20t，所以超载。",
+                "incorrect": "超载是指装载的货物质量超过允许的载重量。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "model_judgement",
+            "prompt": "汽车对水平路面的压力F等于什么？",
+            "options": [
+                "A. F = G总 =（m车 + m沙）g",
+                "B. F = G沙 = m沙·g",
+                "C. F = G车 = m车·g",
+                "D. F = 阻力"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。汽车对地面压力等于汽车和沙子的总重力。",
+                "incorrect": "水平面上，压力 = 总重力 =（车+货物）的重力。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "direction_judgement",
+            "prompt": "要判断「能否在2h内到达」，需要先求什么？",
+            "options": [
+                "A. 由P=Fv和F=f，求出速度v",
+                "B. 由s=vt，求出时间t",
+                "C. 先求速度v，再由s/v求时间t，与2h比较",
+                "D. 直接用功率判断"
+            ],
+            "correct": "C",
+            "feedback": {
+                "correct": "对。先由P=Fv求v，再由t=s/v求时间，然后与2h比较。",
+                "incorrect": "思路：P和f → v → t = s/v → 与2h比较。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}

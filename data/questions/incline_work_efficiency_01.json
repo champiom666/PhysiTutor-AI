@@ -1,0 +1,82 @@
+{
+    "id": "incline_work_efficiency_01",
+    "topic": "斜面机械效率 · 功与功率",
+    "difficulty": "中考",
+    "image": "/static/images/question_12.png",
+    "question_context": {
+        "description": "底面积为0.4m²的大木箱原放在水平地面上，现某人用小车将它从斜面底端匀速推上斜面顶端，整个过程用时10 s。已知木箱重400N，人重600 N，人对木箱的推力为75N，斜面长为4m，斜面高为0.5m。求：\n（1）木箱对水平地面的压力\n（2）木箱沿斜面向上的速度\n（3）人对木箱做的有用功\n（4）这种状况下的机械效率",
+        "ask": [
+            "① 木箱对水平地面的压力",
+            "② 木箱沿斜面向上的速度",
+            "③ 人对木箱做的有用功",
+            "④ 这种状况下的机械效率"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "concept_judgement",
+            "prompt": "木箱静止在水平地面上时，木箱对地面的压力F压等于什么？",
+            "options": [
+                "A. F压 = G箱（木箱重力）",
+                "B. F压 = G箱 + G人",
+                "C. F压 = 推力",
+                "D. F压 = p·S"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。木箱静止在水平面上，压力等于木箱重力400N。",
+                "incorrect": "水平面上静止的物体，对地面压力=物体重力。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "model_judgement",
+            "prompt": "木箱沿斜面匀速运动，已知斜面长s=4m，时间t=10s，速度v用什么公式？",
+            "options": [
+                "A. v = s/t",
+                "B. v = W/t",
+                "C. v = at",
+                "D. v = √(2gh)"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。v = s/t = 4m ÷ 10s = 0.4m/s。",
+                "incorrect": "匀速运动，速度 = 路程/时间。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "concept_judgement",
+            "prompt": "用斜面把木箱送到高处，有用功是指什么？",
+            "options": [
+                "A. 克服重力做的功：W有用 = Gh",
+                "B. 推力做的功：W有用 = Fs",
+                "C. 克服摩擦力做的功",
+                "D. 人做的总功"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。把物体举高h，有用功 = Gh = 400N × 0.5m = 200J。",
+                "incorrect": "使用斜面的目的是把物体举高，有用功是克服重力做的功。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "model_judgement",
+            "prompt": "斜面的机械效率η应该如何计算？",
+            "options": [
+                "A. η = W有用 / W总 = Gh / Fs",
+                "B. η = W总 / W有用",
+                "C. η = F / G",
+                "D. η = h / s"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。η = 有用功/总功 = Gh/(Fs)。",
+                "incorrect": "机械效率 = 有用功/总功，总功是推力F做的功Fs。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}

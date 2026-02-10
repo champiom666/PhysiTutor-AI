@@ -17,3 +17,12 @@ python-dotenv==1.0.0
 # Utilities
 httpx==0.26.0
 requests>=2.28.0
+
+# Database
+sqlalchemy==2.0.46
+
+# File uploads
+python-multipart
+
+# LLM Providers
+zhipuai

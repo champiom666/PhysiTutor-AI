@@ -140,11 +140,19 @@ async def get_recent_logs(limit: int = 20):
 @app.on_event("startup")
 async def startup_event():
     """Initialize services on startup."""
+    from app.models.database import init_db
+    
     print("=" * 50)
     print("PhysiTutor-AI MVP Starting...")
     print(f"Environment: {settings.app_env}")
     print(f"Prompt Version: {settings.prompt_version}")
     print(f"Gemini API: {'Configured' if settings.gemini_api_key else 'Not Configured'}")
+    
+    # Initialize database
+    print("Initializing database...")
+    init_db()
+    print("✓ Database initialized")
+    
     print(f"Frontend: http://localhost:8000/")
     print(f"API Docs: http://localhost:8000/docs")
     print("=" * 50)

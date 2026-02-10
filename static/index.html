@@ -740,6 +740,21 @@
                 我是你的 AI 物理导师，我不会直接告诉你答案，而是通过一步步引导，帮助你建立正确的解题思路。
             </p>
 
+            <div class="action-buttons" style="margin-bottom: 2rem; justify-content: center;">
+                <button class="btn btn-primary" onclick="triggerPhotoUpload()"
+                    style="padding: 1rem 2rem; font-size: 1.1rem;">
+                    <span>📸</span> 拍照/上传题目
+                </button>
+                <input type="file" id="photo-upload" accept="image/*" style="display: none;"
+                    onchange="handlePhotoUpload(this)">
+            </div>
+
+            <div id="upload-loading" class="loading"
+                style="display: none; justify-content: center; margin-bottom: 1rem;">
+                <div class="spinner"></div>
+                <span>正在分析题目，这可能需要几十秒，请稍候...</span>
+            </div>
+
             <div class="feature-cards">
                 <div class="feature-card">
                     <div class="feature-icon">🎯</div>
@@ -820,9 +835,9 @@
                 </button>
             </div>
 
-            <div class="loading" id="loadingStep" style="margin-top: 1rem;">
+            <div class="loading" id="loadingStep" style="margin-top: 1rem; display: none;">
                 <div class="spinner"></div>
-                <span>AI 导师思考中...</span>
+                <span>加载中...</span>
             </div>
         </section>
 
@@ -1001,15 +1016,15 @@
 
         function renderQuestionList(questions) {
             console.log('Rendering questions:', questions); // Debug log
-            
+
             const html = questions.map((q, index) => {
                 // Support both old format (just ID string) and new format (object with id, topic, difficulty)
                 const questionId = typeof q === 'string' ? q : (q.id || q);
                 const topic = typeof q === 'string' ? '物理综合题' : (q.topic || '物理综合题');
                 const difficulty = typeof q === 'string' ? '中考压轴' : (q.difficulty || '中考');
-                
+
                 console.log(`Question ${index + 1}:`, { questionId, topic, difficulty }); // Debug log
-                
+
                 return `
                     <div class="question-card" onclick="startSession('${questionId}')">
                         <div class="question-number">${index + 1}</div>
@@ -1205,7 +1220,7 @@
             if (!state.selectedChoice) return;
 
             elements.submitBtn.disabled = true;
-            elements.loadingStep.style.display = 'flex';
+            // 不显示loading，因为判断是即时的，不需要AI
 
             // Disable all options
             document.querySelectorAll('.option-btn').forEach(btn => {
@@ -1220,7 +1235,6 @@
                 });
 
                 const data = await response.json();
-                elements.loadingStep.style.display = 'none';
 
                 // Show feedback
                 showFeedback(data);
@@ -1234,16 +1248,17 @@
                     selectedBtn.classList.add('incorrect');
                 }
 
-                // Handle next step or completion
+                // Handle next step or completion - 减少延迟，立即显示下一步按钮
                 if (data.enter_reasoning_mode) {
-                    setTimeout(() => showReasoningScreen(), 2000);
+                    setTimeout(() => showReasoningScreen(), 2500);
                 } else if (data.is_completed || data.enter_transfer_mode) {
-                    setTimeout(() => showCompletionScreen(), 2000);
+                    setTimeout(() => showCompletionScreen(), 2500);
                 } else if (data.next_step_available) {
+                    // 立即显示"继续下一步"按钮
                     elements.submitBtn.classList.add('hidden');
                     elements.nextBtn.classList.remove('hidden');
                 } else {
-                    // Wrong answer, allow retry
+                    // Wrong answer, allow retry - 减少延迟
                     setTimeout(() => {
                         document.querySelectorAll('.option-btn').forEach(btn => {
                             btn.disabled = false;
@@ -1252,12 +1267,11 @@
                         elements.feedbackCard.style.display = 'none';
                         elements.submitBtn.disabled = true;
                         state.selectedChoice = null;
-                    }, 2000);
+                    }, 2500);
                 }
 
             } catch (error) {
                 console.error('Error submitting choice:', error);
-                elements.loadingStep.style.display = 'none';
                 elements.submitBtn.disabled = false;
             }
         }
@@ -1432,6 +1446,48 @@
         /** 从分析页进入题目列表，选下一道题 */
         function goToNextQuestion() {
             quitSession();
+        }
+
+        // Photo Upload Logic
+        function triggerPhotoUpload() {
+            document.getElementById('photo-upload').click();
+        }
+
+        async function handlePhotoUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // Show loading
+                const loadingEl = document.getElementById('upload-loading');
+                loadingEl.style.display = 'flex';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const response = await fetch('/session/analyze-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.detail || '分析失败');
+                    }
+
+                    const data = await response.json();
+                    if (data.question_id) {
+                        // Start session immediately
+                        startSession(data.question_id);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('图片分析失败: ' + error.message);
+                } finally {
+                    loadingEl.style.display = 'none';
+                    input.value = ''; // Reset input
+                }
+            }
         }
     </script>
 </body>

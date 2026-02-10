@@ -1,6 +1,7 @@
 venv312
 .env
-data\logs
+data/logs
+physitutor.db
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

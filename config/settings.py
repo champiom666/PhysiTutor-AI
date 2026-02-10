@@ -19,9 +19,17 @@ class Settings(BaseSettings):
     # Project root
     PROJECT_ROOT: Path = PROJECT_ROOT
     
+    # LLM Provider Selection
+    llm_provider: str = os.getenv("LLM_PROVIDER", "gemini")  # gemini or zhipu
+    
     # Gemini API
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
-    gemini_model: str = "gemini-3-flash-preview"
+    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    
+    # Zhipu AI API
+    zhipu_api_key: str = os.getenv("ZHIPU_API_KEY", "")
+    zhipu_model: str = "glm-4"
+    zhipu_vision_model: str = "glm-4v"
     
     # Application
     app_env: str = os.getenv("APP_ENV", "development")

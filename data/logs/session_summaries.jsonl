@@ -20,3 +20,8 @@
 {"session_id": "sess_c79abe60", "question_id": "heat_lpg_01", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-08T18:18:16.922736"}
 {"session_id": "sess_b12f952f", "question_id": "circuit_control_01", "total_steps": 3, "correct_count": 3, "accuracy": 1.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-08T22:21:07.522331"}
 {"session_id": "sess_29446ece", "question_id": "transfer_sess_b12f952f", "total_steps": 3, "correct_count": 3, "accuracy": 1.0, "total_retries": 3, "duration_seconds": null, "completed_at": "2026-02-08T22:23:19.908112"}
+{"session_id": "sess_d02147af", "question_id": "circuit_control_01", "total_steps": 3, "correct_count": 0, "accuracy": 0.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-10T10:09:35.824376"}
+{"session_id": "sess_6318be08", "question_id": "soybean_machine_01", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-10T10:12:54.415891"}
+{"session_id": "sess_053f7873", "question_id": "soybean_machine_01", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 3, "duration_seconds": null, "completed_at": "2026-02-10T10:59:50.847514"}
+{"session_id": "sess_6e567dd4", "question_id": "light_reflection_01", "total_steps": 5, "correct_count": 5, "accuracy": 1.0, "total_retries": 0, "duration_seconds": null, "completed_at": "2026-02-10T11:07:19.282225"}
+{"session_id": "sess_37ee5c4e", "question_id": "water_tank_valve_01", "total_steps": 4, "correct_count": 4, "accuracy": 1.0, "total_retries": 1, "duration_seconds": null, "completed_at": "2026-02-10T11:17:15.022965"}

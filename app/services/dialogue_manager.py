@@ -22,6 +22,7 @@ from app.models.schemas import (
 )
 from app.services.logger import dialogue_logger
 from app.services.llm_service import llm_service
+from app.services.db_service import db_service
 from config.settings import settings
 
 
@@ -113,7 +114,15 @@ class DialogueManager:
             total_steps=len(question.guided_steps)
         )
         
+        # Save to both memory and database
         self.sessions[session.session_id] = session
+        
+        # Persist to database  # Get or create anonymous user if needed
+        user = None
+        if student_id:
+            user = db_service.get_or_create_user(student_id)
+        db_service.create_session(session, user.id if user else None)
+        
         return session
     
     def get_session(self, session_id: str) -> Optional[SessionState]:
@@ -247,6 +256,28 @@ class DialogueManager:
         # Calculate response time
         response_time_ms = int((time.time() - start_time) * 1000)
         
+        # Save step record to database
+        db_service.create_step_record(
+            session_id=session_id,
+            step_id=session.current_step_id,
+            student_choice=choice,
+            is_correct=is_correct,
+            response_time_ms=response_time_ms
+        )
+        
+        # If incorrect, add to mistake book
+        if not is_correct:
+            # Get user_id from session if available
+            db_session = db_service.get_session(session_id)
+            if db_session and db_session.user_id:
+                db_service.create_mistake(
+                    user_id=db_session.user_id,
+                    question_id=session.question_id,
+                    step_id=session.current_step_id,
+                    wrong_choice=choice,
+                    correct_choice=current_step.correct
+                )
+        
         # Log the interaction
         log_entry = DialogueLog(
             session_id=session_id,
@@ -278,6 +309,9 @@ class DialogueManager:
                 # All steps completed -> Enter Reasoning Mode
                 session.status = "reasoning"
                 # We don't log summary yet, wait until reasoning/transfer is done
+        
+        # Update session in database
+        db_service.update_session(session)
         
         return FeedbackResponse(
             session_id=session_id,
@@ -401,6 +435,9 @@ class DialogueManager:
             else:
                 session.status = "completed"
                 self._log_session_summary(session)
+        
+        # Update session in database
+        db_service.update_session(session)
              
         return ReasoningFeedbackResponse(
             session_id=session_id,
@@ -424,6 +461,10 @@ class DialogueManager:
             if session.status == "active":
                 session.status = "completed"
                 self._log_session_summary(session)
+            
+            # Update final state in database
+            db_service.update_session(session)
+            
             del self.sessions[session_id]
         return session
     

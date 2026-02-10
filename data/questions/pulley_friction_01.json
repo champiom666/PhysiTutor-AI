@@ -1,0 +1,82 @@
+{
+    "id": "pulley_friction_01",
+    "topic": "滑轮组与摩擦力 · 机械效率",
+    "difficulty": "中考",
+    "image": "/static/images/question_05.png",
+    "question_context": {
+        "description": "如图所示，一种质量为60 kg，底面积为0.1m²的物体，通过滑轮组在2 5N拉力作用下做匀速直线运动，已知物体受到的滑动摩擦力为物重的0.1倍。求：\n（1）在图上作出物体对水平地面的压力的示意图\n（2）物体所受的重力是多少？\n（3）物体静止时对水平地面的压强是多少？\n（4）该滑轮组的机械效率是多少？",
+        "ask": [
+            "① 在图上作出物体对水平地面的压力的示意图",
+            "② 物体所受的重力是多少？",
+            "③ 物体静止时对水平地面的压强是多少？",
+            "④ 该滑轮组的机械效率是多少？"
+        ]
+    },
+    "guided_steps": [
+        {
+            "step_id": 1,
+            "type": "model_judgement",
+            "prompt": "已知物体质量m=60kg，求物体重力应该用什么公式？",
+            "options": [
+                "A. G = mg （g取10 N/kg）",
+                "B. G = ρVg",
+                "C. G = F/S",
+                "D. G = W/h"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "正确。重力 G = mg，其中m=60kg，g=10 N/kg。",
+                "incorrect": "已知质量m，直接用 G = mg 计算重力。"
+            }
+        },
+        {
+            "step_id": 2,
+            "type": "concept_judgement",
+            "prompt": "物体静止在水平地面上时，物体对地面的压力F等于什么？",
+            "options": [
+                "A. F = G（物体重力）",
+                "B. F = G - f（重力减去摩擦力）",
+                "C. F = 拉力",
+                "D. F = ma"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。物体静止在水平地面上，压力等于重力。",
+                "incorrect": "物体静止在水平面上，对地面的压力在数值上等于物体的重力。"
+            }
+        },
+        {
+            "step_id": 3,
+            "type": "model_judgement",
+            "prompt": "题目说「物体受到的滑动摩擦力为物重的0.1倍」，滑动摩擦力f应该等于？",
+            "options": [
+                "A. f = 0.1G",
+                "B. f = 0.1m",
+                "C. f = μN（其中μ=0.1）",
+                "D. A和C都对"
+            ],
+            "correct": "D",
+            "feedback": {
+                "correct": "正确。f = 0.1G，同时由于N=G，所以f = μN，其中μ=0.1。",
+                "incorrect": "「物重的0.1倍」即 f = 0.1G；同时f = μN = 0.1×G。"
+            }
+        },
+        {
+            "step_id": 4,
+            "type": "direction_judgement",
+            "prompt": "计算滑轮组机械效率η时，有用功W有用是什么？",
+            "options": [
+                "A. 克服摩擦力做的功：W有用 = f·s",
+                "B. 拉力做的功：W有用 = F·s",
+                "C. 克服重力做的功：W有用 = G·h",
+                "D. 克服压力做的功"
+            ],
+            "correct": "A",
+            "feedback": {
+                "correct": "对。物体水平移动，有用功是克服摩擦力做的功 W有用 = f·s。",
+                "incorrect": "滑轮组水平拉物体时，有用功是克服摩擦力做的功。"
+            }
+        }
+    ],
+    "next_similar_question_id": null
+}
